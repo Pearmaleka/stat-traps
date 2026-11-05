@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+message: "If you use StatTraps, please cite it as below."
+title: "StatTraps: Do LLM data-analysis agents know when the analysis is wrong?"
+authors:
+  - family-names: Le
+    given-names: Nam Khanh
+version: 0.1.0
+date-released: 2026-11-05
+license: MIT

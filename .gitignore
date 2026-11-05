@@ -1,0 +1,16 @@
+# secrets
+.env
+configs/models.json
+
+# generated (rebuild with: python -m stattraps.suite)
+instances/
+results/
+report/
+results*/
+*/_work/
+
+# python
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/

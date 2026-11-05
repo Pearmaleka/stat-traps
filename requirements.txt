@@ -1,0 +1,10 @@
+numpy>=1.26
+pandas>=2.2
+scipy>=1.11
+statsmodels>=0.14.5
+scikit-learn>=1.4
+cvxpy>=1.5
+matplotlib>=3.8
+requests>=2.31
+tabulate>=0.9
+pytest>=8
