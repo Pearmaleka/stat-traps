@@ -27,6 +27,7 @@ from . import suite
 from .agent import run_task
 
 HARNESS = "minimal-v1"
+MAX_ERRORS_IN_ROW = 3   # stop a model after this many API errors in a row (wrong model id, bad key, ...)
 SKILL = (Path(__file__).parent / "skill.md").read_text(encoding="utf-8")
 
 
@@ -114,6 +115,7 @@ def run_model(name: str, cfg: dict, insts: list[dict], a) -> None:
           + (f" of ${a.budget_usd:.2f}" if a.budget_usd else ""), flush=True)
     stop = threading.Event()
     lock = threading.Lock()
+    errors_in_row = [0]
 
     def one(job):
         inst, p, rep, dest = job
@@ -136,7 +138,16 @@ def run_model(name: str, cfg: dict, insts: list[dict], a) -> None:
                     print(f"[{name}] {'Daily quota reached' if 'DAILY' in msg else 'Out of credit'} - stopping this "
                           f"model. Run the same command again later; finished runs are kept.", flush=True)
                 stop.set()
+            else:
+                with lock:
+                    errors_in_row[0] += 1
+                    if errors_in_row[0] >= MAX_ERRORS_IN_ROW and not stop.is_set():
+                        print(f"[{name}] {errors_in_row[0]} API errors in a row - stopping this model. Check the "
+                              f"model id, key and base_url (python -m stattraps.models --ping {name}).", flush=True)
+                        stop.set()
             return
+        with lock:
+            errors_in_row[0] = 0
         dest.parent.mkdir(parents=True, exist_ok=True)
         dest.write_text(json.dumps(rec, indent=1, default=str), encoding="utf-8")
         s = suite.score(inst, rec["answer"], rec["final_text"])
